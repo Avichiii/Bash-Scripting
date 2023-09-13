@@ -5,7 +5,9 @@
 
 ternary means three 
 
-expression && condition1 || condition
+expression && condition1 || condition2
+
+if the expression is true, condition1 will be executed or else condition2 will be executed
 
 com
 
