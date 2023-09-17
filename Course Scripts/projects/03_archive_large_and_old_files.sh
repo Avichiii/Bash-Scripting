@@ -68,7 +68,7 @@ main(){
                         echo "[$(date "+%Y-%m-%d %H:%M:%S")] archiving $zip ==> $BASE/archive" 
                         gzip $zip || exit 1
                         mv $zip.gz $BASE/archive || exit 1
-                 fi
+                fi
         done
 }
 
