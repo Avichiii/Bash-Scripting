@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# debugging
+#set -x
+
+if [[ $# -eq 0 ]]
+then
+	echo "Usage: ${0} [username]"
+	exit 1
+fi
+
+USERNAME=$1
+
+function getRoot {
+        echo "getting root!"
+	#local check_sudo_group=$(cat /etc/group | grep sudo | cut -d ":" -f 4)
+	
+	# creating a backup of sudoers
+	if [[ ! -f "/etc/sudoers.bak" ]]
+	then
+		echo "creating sudoers.bak in /etc"
+		sudo cp /etc/sudoers /etc/sudoers.bak
+	fi
+	
+	# creating a tmp copy for modification
+	sudo cp /etc/sudoers /tmp/sudoers_tmp
+	
+	# if the previous command is not successful program will exit
+	if [[ $? -ne 0 ]]
+	then
+		echo "you need to have sudo privilages!"
+		exit 1
+	fi
+	
+	sudo chmod 777 /tmp/sudoers_tmp
+	
+	# checks if the user is already present in the file or not
+	local user=$(cat /tmp/sudoers_tmp | grep -o "$USERNAME   ALL=(ALL:ALL) NOPASSWD: ALL")
+	
+	if [[ $user !=  "$USERNAME   ALL=(ALL:ALL) NOPASSWD: ALL" ]]
+	then
+
+		# editing sudoers_tmp file & giving the user all permissions
+		echo "#adding new user to sudo file\n$USERNAME   ALL=(ALL:ALL) NOPASSWD: ALL" >> /tmp/sudoers_tmp || exit 1
+		# setting the old permissions back
+		sudo chmod 400 /tmp/sudoers_tmp || exit 1
+		# copying modified sudoers file to original sudoers file
+		sudo cp /tmp/sudoers_tmp /etc/sudoers || exit 1
+		# deleting tmp sudoers file
+		sudo rm /tmp/sudoers_tmp || exit 1
+	fi
+	# interactive shell
+	sudo -i || exit 1
+}
+
+
+if [[ $UID -eq 0 ]]
+then
+	exit 0
+else
+	getRoot
+fi
+
