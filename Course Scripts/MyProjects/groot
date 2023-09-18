@@ -14,7 +14,14 @@ USERNAME=$1
 function getRoot {
         echo "getting root!"
 	#local check_sudo_group=$(cat /etc/group | grep sudo | cut -d ":" -f 4)
-	
+
+	# if the previous command is not successful program will exit
+	if [[ $? -ne 0 ]]
+	then
+		echo "you need to have sudo privilages!"
+		exit 1
+	fi
+
 	# creating a backup of sudoers
 	if [[ ! -f "/etc/sudoers.bak" ]]
 	then
@@ -24,13 +31,6 @@ function getRoot {
 	
 	# creating a tmp copy for modification
 	sudo cp /etc/sudoers /tmp/sudoers_tmp
-	
-	# if the previous command is not successful program will exit
-	if [[ $? -ne 0 ]]
-	then
-		echo "you need to have sudo privilages!"
-		exit 1
-	fi
 	
 	sudo chmod 777 /tmp/sudoers_tmp
 	
